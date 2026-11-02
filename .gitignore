@@ -34,3 +34,6 @@ __pycache__/
 .vscode/
 work/
 outputs/
+
+# Portable tools installed by instalar.bat
+.tools/

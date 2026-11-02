@@ -4,8 +4,8 @@ Aplicación web local para organizar y descargar, para uso personal, pistas de p
 
 ## Inicio rápido
 
-1. Haz doble clic en `start.bat`.
-   En el primer inicio se instala el proveedor local de PO Tokens recomendado por yt-dlp. Después la interfaz se abre en Chrome.
+1. Haz doble clic en `instalar.bat` para preparar todo. Despues usa `start.bat` para abrir la aplicacion.
+   `start.bat` tambien instala lo que falte en el primer inicio y abre la interfaz en el navegador.
 2. Pega la URL de una playlist pública.
 3. Revisa la selección, el formato, la portada y la carpeta de destino.
 4. Pulsa **Descargar seleccionadas**.
@@ -56,3 +56,17 @@ Pruebas: python -m unittest discover -s tests -v.
 El proveedor oficial 2.0.2 se instala con los manifiestos revisados de runtime/, sin las herramientas de lint del proyecto externo. Se conserva su licencia GPL-3.0-only y se ejecuta como proceso separado. Sus dependencias y las de Python fueron auditadas antes de la publicación; deben volver a revisarse al actualizar.
 
 Referencias de seguridad: https://flask.palletsprojects.com/en/stable/web-security/ y https://github.com/yt-dlp/yt-dlp#configuration.
+
+## Instalador para Windows
+
+- **instalar.bat:** prepara las dependencias y termina sin abrir la aplicacion.
+- **start.bat:** comprueba la instalacion y abre la aplicacion; reutiliza el servidor si ya esta abierto desde esta carpeta.
+- Si falta Python 3.12+, Node.js 22+ con npm o Git, instala el paquete correspondiente mediante WinGet. Windows puede solicitar autorizacion o mostrar las condiciones del instalador.
+- Si WinGet no esta disponible, muestra el enlace oficial de lo que falta. Instala ese componente y vuelve a ejecutar instalar.bat.
+- Crea un entorno .venv dentro del proyecto. Instala alli las bibliotecas Python; no modifica las bibliotecas de otros proyectos.
+- Si faltan FFmpeg o FFprobe, descarga FFmpeg Essentials 9.0.2 desde Gyan, comprueba su SHA-256 publicado y lo extrae en .tools/. Solo modifica el PATH del proceso actual.
+- Instala el proveedor local de tokens con los manifiestos de dependencias revisados. Los siguientes inicios reutilizan los componentes ya preparados.
+- Requiere Windows 10/11 de 64 bits y conexion a Internet para la primera instalacion. No omite solicitudes de permisos ni acepta automaticamente acuerdos de instalacion.
+- .venv/, .tools/, vendor/, cookies y descargas estan excluidos de Git.
+
+Referencias del instalador: https://learn.microsoft.com/windows/package-manager/winget/install, https://nodejs.org/en/download y https://www.gyan.dev/ffmpeg/builds/.
