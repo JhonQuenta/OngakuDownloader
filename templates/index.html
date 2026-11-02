@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>OngakuDownloader</title>
+  <link id="appFavicon" rel="icon" type="image/svg+xml" href="/static/favicon.svg?v=1">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div>
+        <p class="eyebrow">DESCARGADOR LOCAL</p>
+        <h1>OngakuDownloader</h1>
+        <p class="subtitle">Tus playlists, ordenadas y listas para escuchar sin conexión.</p>
+      </div>
+      <div id="serverBadge" class="server-badge">Comprobando sistema…</div>
+    </header>
+
+    <main>
+      <section class="load-panel panel">
+        <label for="playlistUrl">Playlist de YouTube o YouTube Music</label>
+        <div class="url-row">
+          <input id="playlistUrl" type="url" placeholder="https://music.youtube.com/playlist?list=…" autocomplete="off">
+          <button id="loadBtn" class="primary-btn"><span>Cargar playlist</span></button>
+        </div>
+        <div class="auth-row">
+          <label for="authBrowserSelect">Sesión de YouTube</label>
+          <select id="authBrowserSelect">
+            <option value="none" selected>Sin cookies · recomendado primero</option>
+            <option value="chrome">Usar mi sesión de Chrome · puede fallar por DPAPI</option>
+            <option value="edge">Usar mi sesión de Edge · Edge cerrado</option>
+            <option value="firefox">Usar mi sesión de Firefox · recomendado</option>
+          </select>
+          <span id="authHint">Úsala solo si YouTube exige iniciar sesión, confirmar edad o verificar que no eres un bot.</span>
+        </div>
+        <div id="loadStatus" class="inline-status hidden" role="status"></div>
+      </section>
+
+      <section id="workspace" class="hidden">
+        <div class="playlist-heading">
+          <div>
+            <p class="eyebrow">PLAYLIST</p>
+            <h2 id="playlistTitle">—</h2>
+            <p id="playlistMeta" class="muted"></p>
+          </div>
+          <div class="selection-pill"><strong id="selectedCount">0</strong> seleccionadas</div>
+        </div>
+
+        <section class="toolbar panel">
+          <div class="search-wrap">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="Buscar por canción o artista…">
+          </div>
+          <button id="duplicatesBtn" class="secondary-btn">Detectar repetidas <span id="duplicateCount" class="count-badge hidden">0</span></button>
+          <div class="view-switch" role="group" aria-label="Vista">
+            <button id="gridViewBtn" class="icon-btn active" title="Cuadrícula" aria-label="Vista de cuadrícula">▦</button>
+            <button id="listViewBtn" class="icon-btn" title="Lista compacta" aria-label="Vista de lista">☷</button>
+          </div>
+        </section>
+
+        <section class="options-layout">
+          <aside class="options panel">
+            <div class="option-heading">
+              <h3>Opciones de descarga</h3>
+              <span class="quality-chip">Mejor calidad por pista</span>
+            </div>
+
+            <label class="field-label" for="formatSelect">Formato</label>
+            <select id="formatSelect">
+              <option value="opus">Opus · fuente preferida de YouTube</option>
+              <option value="m4a">M4A · buena compatibilidad</option>
+              <option value="mp3">MP3 · VBR máxima calidad</option>
+            </select>
+
+            <label class="toggle-row">
+              <input id="coverToggle" type="checkbox" checked>
+              <span class="toggle-ui"></span>
+              <span><strong>Descargar portada</strong><small>Cuadrada e incrustada</small></span>
+            </label>
+            <div id="coverSizes" class="segmented">
+              <button data-size="320">320</button>
+              <button data-size="500" class="active">500</button>
+              <button data-size="1000">1000</button>
+            </div>
+
+            <label class="toggle-row">
+              <input id="lyricsToggle" type="checkbox" checked>
+              <span class="toggle-ui"></span>
+              <span><strong>Descargar letras</strong><small>Cuando haya subtítulos disponibles</small></span>
+            </label>
+
+            <div class="split-fields">
+              <label>Descargas simultáneas
+                <select id="concurrencySelect">
+                  <option value="1">1 · máxima estabilidad</option>
+                  <option value="2" selected>2 · recomendado</option>
+                  <option value="3">3 · rápido</option>
+                  <option value="4">4 · agresivo</option>
+                </select>
+              </label>
+              <label>Tiempo máximo/pista
+                <select id="timeoutSelect">
+                  <option value="5">5 min</option>
+                  <option value="10">10 min</option>
+                  <option value="15" selected>15 min</option>
+                  <option value="30">30 min</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="field-label" for="downloadRoot">Carpeta base</label>
+            <div class="folder-picker">
+              <input id="downloadRoot" class="path-input" type="text" spellcheck="false" readonly title="Carpeta base seleccionada">
+              <button id="chooseFolderBtn" class="secondary-btn" type="button">Elegir carpeta</button>
+            </div>
+            <p class="field-help">Se creará dentro una carpeta con el nombre de la playlist.</p>
+
+            <button id="downloadBtn" class="primary-btn download-btn">Descargar seleccionadas</button>
+            <p class="legal-note">Descarga solo contenido que tengas derecho a guardar.</p>
+          </aside>
+
+          <section class="catalog panel">
+            <div class="catalog-bar">
+              <label class="check-all"><input id="selectVisible" type="checkbox" checked> Seleccionar visibles</label>
+              <button id="selectAllBtn" class="link-btn">Seleccionar todas</button>
+              <button id="clearAllBtn" class="link-btn">Quitar todas</button>
+              <span id="resultCount" class="muted"></span>
+            </div>
+            <div id="songs" class="songs grid-view" aria-live="polite"></div>
+            <div id="emptyState" class="empty-state hidden">No hay coincidencias para esa búsqueda.</div>
+            <nav id="pagination" class="pagination" aria-label="Páginas"></nav>
+          </section>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="duplicatesModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="duplicatesTitle">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <div><p class="eyebrow">REVISIÓN</p><h2 id="duplicatesTitle">Canciones repetidas</h2></div>
+        <button class="close-btn" data-close="duplicatesModal" aria-label="Cerrar">×</button>
+      </div>
+      <p class="muted">Las coincidencias se agrupan aquí sin alterar la lista principal. Desmarca las versiones que no quieras descargar.</p>
+      <div id="duplicateGroups" class="duplicate-groups"></div>
+      <div class="modal-actions"><button class="secondary-btn" data-close="duplicatesModal">Aplicar y cerrar</button></div>
+    </div>
+  </div>
+
+  <div id="lyricsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="lyricsTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div><p class="eyebrow">LETRA / SUBTÍTULOS</p><h2 id="lyricsTitle">Letra</h2></div>
+        <button class="close-btn" data-close="lyricsModal" aria-label="Cerrar">×</button>
+      </div>
+      <pre id="lyricsText" class="lyrics-text">Buscando…</pre>
+    </div>
+  </div>
+
+  <div id="downloadModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="downloadTitle">
+    <div class="modal-card">
+      <div class="download-orbit" aria-hidden="true"><span>↓</span></div>
+      <h2 id="downloadTitle">Descargando playlist</h2>
+      <p id="downloadSummary" class="muted">Preparando cola…</p>
+      <div class="progress-track"><div id="progressFill"></div></div>
+      <div class="progress-stats"><strong id="progressPercent">0%</strong><span id="progressNumbers">0 de 0</span></div>
+      <div id="activeTracks" class="active-tracks"></div>
+      <div class="destination-box"><span>Carpeta de destino</span><code id="destinationPath">—</code></div>
+      <div class="modal-actions">
+        <button id="openFolderBtn" class="secondary-btn" disabled>Abrir carpeta</button>
+        <button id="cancelBtn" class="danger-btn">Cancelar descarga</button>
+        <button id="closeDownloadBtn" class="primary-btn hidden">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="errorsPanel" class="errors-drawer hidden">
+    <div class="errors-heading">
+      <div><p class="eyebrow">REVISAR</p><h2><span id="errorCount">0</span> descargas con error</h2></div>
+      <button id="retryAllBtn" class="secondary-btn">Reintentar todas</button>
+    </div>
+    <div id="errorsList"></div>
+  </section>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

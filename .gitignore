@@ -1,0 +1,36 @@
+# Personal media and credentials
+downloads/
+*.mp3
+*.m4a
+*.opus
+*.webm
+*.mp4
+*.part
+*.ytdl
+*.vtt
+*.srt
+*.lrc
+.env
+.env.*
+!.env.example
+*cookies*
+*.log
+*.har
+*.pem
+*.key
+*.pfx
+*.p12
+*.sqlite*
+*.db
+# Runtime and generated files
+vendor/
+.venv/
+venv/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+.vscode/
+work/
+outputs/
